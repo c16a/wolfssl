@@ -7630,9 +7630,11 @@ int ssl_RemoveSession(const char* clientIp, int clientPort,
 {
     IpAddrInfo clientAddr = {0};
     IpAddrInfo serverAddr = {0};
+    IpInfo ipInfo;
+    TcpInfo tcpInfo;
     SnifferSession* session;
     int ret = -1;  /* Default to not found */
-    word32 i;
+    word32 row;
 
     if (clientIp == NULL || serverIp == NULL) {
         SetError(BAD_IPVER_STR, error, NULL, 0);
@@ -7679,33 +7681,40 @@ int ssl_RemoveSession(const char* clientIp, int clientPort,
 
     /* No need to ensure IP versions match - client could use IPv4 while server uses IPv6 */
 
+    /* Set up IpInfo and TcpInfo for SessionHash */
+    XMEMSET(&ipInfo, 0, sizeof(ipInfo));
+    XMEMSET(&tcpInfo, 0, sizeof(tcpInfo));
+
+    /* Set up client->server direction */
+    ipInfo.src = clientAddr;
+    ipInfo.dst = serverAddr;
+    tcpInfo.srcPort = clientPort;
+    tcpInfo.dstPort = serverPort;
+
+    /* Calculate the hash row for this session */
+    row = SessionHash(&ipInfo, &tcpInfo);
+
     LOCK_SESSION();
 
-    /* Search through all rows in the session table */
-    for (i = 0; i < HASH_SIZE; i++) {
-        session = SessionTable[i];
+    /* Search only the specific row in the session table */
+    session = SessionTable[row];
 
-        while (session) {
-            SnifferSession* next = session->next;
+    while (session) {
+        SnifferSession* next = session->next;
 
-            /* Check if this session matches the specified client/server IP/port */
-            if (MatchAddr(session->client, clientAddr) &&
-                MatchAddr(session->server, serverAddr) &&
-                session->cliPort == clientPort &&
-                session->srvPort == serverPort) {
-                
-                /* Use RemoveSession to remove and free the session */
-                RemoveSession(session, NULL, NULL, i);
-                ret = 0;  /* Session found and freed */
-                break;
-            }
+        /* Check if this session matches the specified client/server IP/port */
+        if (MatchAddr(session->client, clientAddr) &&
+            MatchAddr(session->server, serverAddr) &&
+            session->cliPort == clientPort &&
+            session->srvPort == serverPort) {
             
-            session = next;
+            /* Use RemoveSession to remove and free the session */
+            RemoveSession(session, NULL, NULL, row);
+            ret = 0;  /* Session found and freed */
+            break;
         }
         
-        if (ret == 0) {
-            break;  /* Session found and freed, exit the loop */
-        }
+        session = next;
     }
 
     UNLOCK_SESSION();
