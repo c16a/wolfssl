@@ -7631,7 +7631,6 @@ int ssl_RemoveSession(const char* clientIp, int clientPort,
     IpAddrInfo clientAddr = {0};
     IpAddrInfo serverAddr = {0};
     SnifferSession* session;
-    SnifferSession* previous = NULL;
     int ret = -1;  /* Default to not found */
     word32 i;
 
@@ -7688,7 +7687,6 @@ int ssl_RemoveSession(const char* clientIp, int clientPort,
 
     /* Search through all rows in the session table */
     for (i = 0; i < HASH_SIZE; i++) {
-        previous = NULL;
         session = SessionTable[i];
 
         while (session) {
@@ -7700,21 +7698,12 @@ int ssl_RemoveSession(const char* clientIp, int clientPort,
                 session->cliPort == clientPort &&
                 session->srvPort == serverPort) {
                 
-                /* Remove the session from the linked list */
-                if (previous) {
-                    previous->next = session->next;
-                }
-                else {
-                    SessionTable[i] = session->next;
-                }
-                
-                /* Free the session */
-                FreeSnifferSession(session);
+                /* Use RemoveSession to remove and free the session */
+                RemoveSession(session, NULL, NULL, i);
                 ret = 0;  /* Session found and freed */
                 break;
             }
             
-            previous = session;
             session = next;
         }
         
