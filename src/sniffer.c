@@ -7620,6 +7620,115 @@ int ssl_LoadSecretsFromKeyLogFile(const char* keylogfile, char* error)
 #endif /* WOLFSSL_SNIFFER_KEYLOGFILE */
 
 
+/*
+ * Removes a session from the SessionTable based on client/server IP/port tuples
+ * Returns 0 if a session was found and freed, -1 otherwise
+ */
+int ssl_RemoveSession(const char* clientIp, int clientPort,
+                      const char* serverIp, int serverPort,
+                      char* error)
+{
+    IpAddrInfo clientAddr = {0};
+    IpAddrInfo serverAddr = {0};
+    SnifferSession* session;
+    SnifferSession* previous = NULL;
+    int ret = -1;  /* Default to not found */
+    word32 i;
+
+    if (clientIp == NULL || serverIp == NULL) {
+        SetError(BAD_IPVER_STR, error, NULL, 0);
+        return ret;
+    }
+
+    /* Set up client IP address */
+    clientAddr.version = IPV4;
+    clientAddr.ip4 = XINET_ADDR(clientIp);
+    if (clientAddr.ip4 == XINADDR_NONE) {
+    #ifdef FUSION_RTOS
+        if (XINET_PTON(AF_INET6, clientIp, clientAddr.ip6,
+                       sizeof(clientAddr.ip4)) == 1)
+    #else
+        if (XINET_PTON(AF_INET6, clientIp, clientAddr.ip6) == 1)
+    #endif
+        {
+            clientAddr.version = IPV6;
+        }
+        else {
+            SetError(BAD_IPVER_STR, error, NULL, 0);
+            return ret;
+        }
+    }
+
+    /* Set up server IP address */
+    serverAddr.version = IPV4;
+    serverAddr.ip4 = XINET_ADDR(serverIp);
+    if (serverAddr.ip4 == XINADDR_NONE) {
+    #ifdef FUSION_RTOS
+        if (XINET_PTON(AF_INET6, serverIp, serverAddr.ip6,
+                       sizeof(serverAddr.ip4)) == 1)
+    #else
+        if (XINET_PTON(AF_INET6, serverIp, serverAddr.ip6) == 1)
+    #endif
+        {
+            serverAddr.version = IPV6;
+        }
+        else {
+            SetError(BAD_IPVER_STR, error, NULL, 0);
+            return ret;
+        }
+    }
+
+    /* Ensure IP versions match */
+    if (clientAddr.version != serverAddr.version) {
+        SetError(BAD_IPVER_STR, error, NULL, 0);
+        return ret;
+    }
+
+    LOCK_SESSION();
+
+    /* Search through all rows in the session table */
+    for (i = 0; i < HASH_SIZE; i++) {
+        previous = NULL;
+        session = SessionTable[i];
+
+        while (session) {
+            SnifferSession* next = session->next;
+
+            /* Check if this session matches the specified client/server IP/port */
+            if (MatchAddr(session->client, clientAddr) &&
+                MatchAddr(session->server, serverAddr) &&
+                session->cliPort == clientPort &&
+                session->srvPort == serverPort) {
+                
+                /* Remove the session from the linked list */
+                if (previous) {
+                    previous->next = session->next;
+                }
+                else {
+                    SessionTable[i] = session->next;
+                }
+                
+                /* Free the session */
+                FreeSnifferSession(session);
+                ret = 0;  /* Session found and freed */
+                break;
+            }
+            
+            previous = session;
+            session = next;
+        }
+        
+        if (ret == 0) {
+            break;  /* Session found and freed, exit the loop */
+        }
+    }
+
+    UNLOCK_SESSION();
+
+    return ret;
+}
+
+
 #undef ERROR_OUT
 
 #endif /* WOLFSSL_SNIFFER */
