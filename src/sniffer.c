@@ -7677,11 +7677,7 @@ int ssl_RemoveSession(const char* clientIp, int clientPort,
         }
     }
 
-    /* Ensure IP versions match */
-    if (clientAddr.version != serverAddr.version) {
-        SetError(BAD_IPVER_STR, error, NULL, 0);
-        return ret;
-    }
+    /* No need to ensure IP versions match - client could use IPv4 while server uses IPv6 */
 
     LOCK_SESSION();
 
