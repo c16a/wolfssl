@@ -912,6 +912,7 @@ extern const WOLFSSL_ObjectInfo wolfssl_object_info[];
 #define WC_NID_pkcs7_signed 22
 #define WC_NID_pkcs7_enveloped 23
 #define WC_NID_pkcs7_signedAndEnveloped 24
+#define WC_NID_pkcs7_data 26
 #define WC_NID_pkcs9_emailAddress     48
 #define WC_NID_pkcs9_unstructuredName 49
 #define WC_NID_pkcs9_contentType 50  /* 1.2.840.113549.1.9.3 */
@@ -988,6 +989,7 @@ extern const WOLFSSL_ObjectInfo wolfssl_object_info[];
 #define NID_pkcs7_signed WC_NID_pkcs7_signed
 #define NID_pkcs7_enveloped WC_NID_pkcs7_enveloped
 #define NID_pkcs7_signedAndEnveloped WC_NID_pkcs7_signedAndEnveloped
+#define NID_pkcs7_data WC_NID_pkcs7_data
 #define NID_pkcs9_unstructuredName WC_NID_pkcs9_unstructuredName
 #define NID_pkcs9_contentType WC_NID_pkcs9_contentType
 #define NID_pkcs9_challengePassword WC_NID_pkcs9_challengePassword

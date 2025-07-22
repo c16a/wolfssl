@@ -18617,6 +18617,7 @@ const WOLFSSL_ObjectInfo wolfssl_object_info[] = {
     { WC_NID_userId, WC_NAME_USER_ID_OID, oidCertNameType, "UID", "userId"},
     { WC_NID_netscape_cert_type, NETSCAPE_CT_OID, oidCertNameType,
       "nsCertType", "Netscape Cert Type"},
+    { WC_NID_pkcs7_data, DATA, oidCertNameType, "pkcs7-data", "pkcs7-data"},
 
 #if defined(WOLFSSL_CERT_REQ) || defined(WOLFSSL_CERT_NAME_ALL)
     { WC_NID_pkcs9_challengePassword, CHALLENGE_PASSWORD_OID,

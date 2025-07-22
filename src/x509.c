@@ -13875,6 +13875,10 @@ static int get_dn_attr_by_nid(int n, const char** buf)
             str = "mail";
             len = 4;
             break;
+        case WC_NID_pkcs7_data:
+            str = "pkcs7-data";
+            len = 10;
+            break;
         default:
             WOLFSSL_MSG("Attribute type not found");
             str = NULL;
