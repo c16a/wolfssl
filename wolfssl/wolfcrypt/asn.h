@@ -1230,6 +1230,9 @@ enum Oid_Types {
 #ifdef WOLFSSL_SUBJ_DIR_ATTR
     oidSubjDirAttrType  = 21,
 #endif
+#ifdef HAVE_PKCS7
+    oidPkcs7Type        = 22,
+#endif
     oidIgnoreType
 };
 

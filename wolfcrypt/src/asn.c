@@ -4468,6 +4468,8 @@ static word32 SetBitString16Bit(word16 val, byte* output)
 #ifdef HAVE_PKCS7
 /* From RFC 3211 */
 static const byte wrapPwriKekOid[] = {42, 134, 72, 134, 247, 13, 1, 9, 16, 3,9};
+/* PKCS#7 content types */
+static const byte pkcs7DataOid[] = {42, 134, 72, 134, 247, 13, 1, 7, 1};
 #endif
 
 /* cmsKeyAgreeType */
@@ -6429,6 +6431,18 @@ const byte* OidFromId(word32 id, word32 type, word32* oidSz)
             }
             break;
 #endif /* WOLFSSL_SUBJ_DIR_ATTR */
+#ifdef HAVE_PKCS7
+        case oidPkcs7Type:
+            switch (id) {
+                case DATA:
+                    oid = pkcs7DataOid;
+                    *oidSz = sizeof(pkcs7DataOid);
+                    break;
+                default:
+                    break;
+            }
+            break;
+#endif
         case oidIgnoreType:
         default:
             break;

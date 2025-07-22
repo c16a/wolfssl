@@ -5493,6 +5493,29 @@ static WOLFSSL_X509_NAME_ENTRY* GetEntryByNID(WOLFSSL_X509_NAME* name, int nid,
     return ret;
 }
 
+static WOLFSSL_X509_NAME_ENTRY* GetEntryByOID(WOLFSSL_X509_NAME* name, 
+        const WOLFSSL_ASN1_OBJECT* obj, int* idx)
+{
+    int i;
+    WOLFSSL_X509_NAME_ENTRY* ret = NULL;
+    
+    if (!obj || !obj->obj) {
+        return NULL;
+    }
+    
+    for (i = *idx; i < MAX_NAME_ENTRIES; i++) {
+        if (name->entry[i].set && name->entry[i].object) {
+            if (obj->objSz == name->entry[i].object->objSz &&
+                XMEMCMP(obj->obj, name->entry[i].object->obj, obj->objSz) == 0) {
+                ret = &name->entry[i];
+                *idx = i;
+                break;
+            }
+        }
+    }
+    return ret;
+}
+
 
 /* Used to get a string from the WOLFSSL_X509_NAME structure that
  * corresponds with the NID value passed in. This finds the first entry with
@@ -13212,26 +13235,23 @@ WOLFSSL_ASN1_OBJECT* wolfSSL_X509_NAME_ENTRY_get_object(
     int wolfSSL_X509_NAME_get_index_by_OBJ(WOLFSSL_X509_NAME *name,
                                            const WOLFSSL_ASN1_OBJECT *obj,
                                            int idx) {
-        if (!name || idx >= MAX_NAME_ENTRIES ||
-                !obj || !obj->obj) {
+        WOLFSSL_X509_NAME_ENTRY* entry;
+        
+        if (!name || idx >= MAX_NAME_ENTRIES || !obj) {
             return WOLFSSL_FATAL_ERROR;
         }
 
         if (idx < 0) {
-            idx = -1;
+            idx = 0;
+        } else {
+            idx++; /* Start searching from next index */
         }
 
-        for (idx++; idx < MAX_NAME_ENTRIES; idx++) {
-            /* Find index of desired name */
-            if (name->entry[idx].set) {
-                if (XSTRLEN(obj->sName) ==
-                        XSTRLEN(name->entry[idx].object->sName) &&
-                    XSTRNCMP((const char*) obj->sName,
-                        name->entry[idx].object->sName, obj->objSz - 1) == 0) {
-                    return idx;
-                }
-            }
+        entry = GetEntryByOID(name, obj, &idx);
+        if (entry != NULL) {
+            return idx;
         }
+        
         return WOLFSSL_FATAL_ERROR;
     }
 #endif
