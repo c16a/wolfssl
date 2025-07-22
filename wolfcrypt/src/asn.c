@@ -6354,6 +6354,18 @@ const byte* OidFromId(word32 id, word32 type, word32* oidSz)
                     break;
             }
             break;
+#endif
+#ifdef HAVE_PKCS7
+        case oidCertNameType:
+            switch (id) {
+                case WC_NID_pkcs7_data:
+                    oid = pkcs7DataOid;
+                    *oidSz = sizeof(pkcs7DataOid);
+                    break;
+                default:
+                    break;
+            }
+            break;
 #endif /* WOLFSSL_APACHE_HTTPD */
 #ifdef WOLFSSL_CERT_REQ
         case oidCsrAttrType:
