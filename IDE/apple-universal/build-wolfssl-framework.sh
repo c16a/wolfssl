@@ -27,9 +27,9 @@ OUTDIR=$(pwd)/artifacts
 LIPODIR=${OUTDIR}/lib
 SDK_OUTPUT_DIR=${OUTDIR}/xcframework
 
-CFLAGS_COMMON=""
+CFLAGS_COMMON="-DNO_DES3 -DNO_DSA -DNO_MD4 -DNO_MD5 -DNO_SHA -DNO_RC4 -DNO_RSA -DNO_OLD_TLS"
 # Base configure flags
-CONF_OPTS="--disable-shared --enable-static"
+CONF_OPTS="--disable-shared --enable-static --enable-mlkem --enable-dilithium --enable-sha3 --enable-curve448 --enable-ed448 --enable-ed448-stream"
 
 helpFunction()
 {
@@ -75,7 +75,7 @@ build() { # <ARCH=arm64|x86_64> <TYPE=iphonesimulator|iphoneos|macosx|watchos|wa
 }
 
 XCFRAMEWORKS=
-for type in iphonesimulator macosx appletvsimulator watchsimulator ; do
+for type in iphonesimulator macosx ; do
     build arm64 ${type}
     build x86_64 ${type}
 
@@ -90,7 +90,7 @@ for type in iphonesimulator macosx appletvsimulator watchsimulator ; do
     XCFRAMEWORKS+=" -library ${LIPODIR}/libwolfssl-${type}.a -headers ${OUTDIR}/wolfssl-${type}-arm64/include"
 done
 
-for type in iphoneos appletvos ; do
+for type in iphoneos ; do
     build arm64 ${type}
 
     # Create universal binaries from architecture-specific static libraries
