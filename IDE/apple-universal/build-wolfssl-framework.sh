@@ -27,7 +27,7 @@ OUTDIR=$(pwd)/artifacts
 LIPODIR=${OUTDIR}/lib
 SDK_OUTPUT_DIR=${OUTDIR}/xcframework
 
-CFLAGS_COMMON="-DNO_DES3 -DNO_DSA -DNO_MD4 -DNO_MD5 -DNO_SHA -DNO_RC4 -DNO_RSA -DNO_OLD_TLS"
+CFLAGS_COMMON="-DNO_DES3 -DNO_DSA -DNO_MD4 -DNO_MD5 -DNO_SHA -DNO_RC4 -DNO_RSA -DNO_OLD_TLS -DNO_WOLFSSL_CLIENT -DNO_WOLFSSL_SERVER -DNO_SHA256 -DNO_AES_128 -DNO_AES_192 -DNO_OLD_SSL_NAMES -DNO_OLD_WC_NAMES -DNO_OLD_POLY1305"
 # Base configure flags
 CONF_OPTS="--disable-shared --enable-static --enable-mlkem --enable-dilithium --enable-sha3 --enable-curve448 --enable-ed448 --enable-ed448-stream"
 
