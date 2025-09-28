@@ -21,3 +21,14 @@ jobs:
               run: |
                   cd IDE/apple-universal
                   ./build-wolfssl-framework.sh
+
+            - name: Compress framwork file
+              run: |
+                  zip -r IDE/apple-universal/artifacts/xcframework/libwolfssl.xcframework.zip IDE/apple-universal/artifacts/xcframework/libwolfssl.xcframework
+
+            - name: Archive framework archive
+              uses: actions/upload-artifact@v4
+              with:
+                  name: zipped-framework
+                  path: |
+                      IDE/apple-universal/artifacts/xcframework/libwolfssl.xcframework.zip

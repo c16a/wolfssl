@@ -29,7 +29,7 @@ SDK_OUTPUT_DIR=${OUTDIR}/xcframework
 
 CFLAGS_COMMON="-DNO_DES3 -DNO_DSA -DNO_MD4 -DNO_MD5 -DNO_SHA -DNO_RC4 -DNO_RSA -DNO_OLD_TLS"
 # Base configure flags
-CONF_OPTS="--disable-shared --enable-static --enable-fips=ready --enable-mlkem --enable-dilithium --enable-sha3 --enable-curve448 --enable-ed448 --enable-ed448-stream"
+CONF_OPTS="--disable-shared --enable-static --enable-mlkem --enable-dilithium --enable-sha3 --enable-curve448 --enable-ed448 --enable-ed448-stream"
 
 helpFunction()
 {
