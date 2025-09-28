@@ -75,7 +75,7 @@ build() { # <ARCH=arm64|x86_64> <TYPE=iphonesimulator|iphoneos|macosx|watchos|wa
 }
 
 XCFRAMEWORKS=
-for type in iphonesimulator macosx ; do
+for type in iphonesimulator ; do
     build arm64 ${type}
     build x86_64 ${type}
 
